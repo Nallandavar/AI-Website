@@ -1,0 +1,38 @@
+from flask import Flask, request, jsonify
+import os
+from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+
+# Image Upload Handling
+@app.route('/upload_image', methods=['POST'])
+def upload_image():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file passed"})
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"})
+    filename = secure_filename(file.filename)
+    if not (filename.endswith(".png") or filename.endswith(".jpg") or filename.endswith(".jpeg")):
+        return jsonify({"error": "Invalid format"})
+    file.save(os.path.join('uploads/', filename))
+    # Resize and save thumbnail (implement the logic to resize the image and save the thumbnail)
+    return jsonify({"message": "Image uploaded successfully"})
+
+# Video Upload Handling
+@app.route('/upload_video', methods=['POST'])
+def upload_video():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file passed"})
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"})
+    if not file.filename.endswith(".mp4"):
+        return jsonify({"error": "Invalid file type. Please upload a .MP4 file"})
+    filename = secure_filename(file.filename)
+    file.save(os.path.join('uploads/', filename))
+    # Call your AI API or perform thumbnail generation here
+    return jsonify({"message": "Video uploaded successfully"})
+
+if __name__ == '__main__':
+    app.run()
